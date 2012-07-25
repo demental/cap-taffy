@@ -1,10 +1,6 @@
 require 'rubygems'
-begin
-  gem 'taps', '>= 0.2.8', '< 0.3.0'
-  require 'taps/client_session'
-rescue LoadError
-  error "Install the Taps gem to use db commands. On most systems this will be:\nsudo gem install taps"
-end
+gem 'taps', '>= 0.2.8', '< 0.3.30'
+require 'taps/client_session'
 
 require File.join(File.dirname(__FILE__), %w[.. cap-taffy]) unless defined?(CapTaffy)
 require File.join(File.dirname(__FILE__), 'parse')
@@ -41,7 +37,7 @@ module CapTaffy::Db
   # Generates the remote url used by Taps push/pull.
   #
   # ==== Parameters
-  # 
+  #
   # * <tt>:login, :password, :host, :port</tt> - See #run.
   #
   # ==== Examples
@@ -91,9 +87,9 @@ module CapTaffy::Db
   end
 
   # The meat of the operation. Runs operations after setting up the Taps server.
-  # 
+  #
   # 1. Runs the <tt>taps</tt> taps command to start the Taps server (assuming Sinatra is running on Thin)
-  # 2. Wait until the server is ready 
+  # 2. Wait until the server is ready
   # 3. Execute block on Taps client
   # 4. Close the connection(s) and bid farewell.
   #
@@ -168,22 +164,22 @@ Capistrano::Configuration.instance.load do
 
     desc <<-DESC
       Push a local database into the app's remote database.
-      
+
       Performs push from local development database to remote production database.
       Opens a Taps server on port 5000. (Ensure port is opened on the remote server).
-      
+
         # alternately, specify a different port
         cap db:push -s taps_port=4321
-        
+
       For the security conscious:
-      
+
         # use ssh local forwarding (ensure [port] is available on both endpoints)
         ssh -N -L[port]:127.0.0.1:[port] [user]@[remote-server]
-        
+
         # then push locally
         cap db:push -s taps_port=[port] -s local=true
     DESC
-    task :push, :roles => :app do      
+    task :push, :roles => :app do
       detect
 
       login = fetch(:user)
@@ -203,13 +199,13 @@ Capistrano::Configuration.instance.load do
 
     desc <<-DESC
       Pull the app's database into a local database.
-      
+
       Performs pull from remote production database to local development database.
       Opens a Taps server on port 5000. (Ensure port is opened on the remote server).
-        
+
         # alternately, specify a different port
         cap db:pull -s taps_port=4321
-        
+
       For the security conscious:
 
         # use ssh local forwarding (ensure [port] is available on both endpoints)
