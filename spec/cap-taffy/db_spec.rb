@@ -231,7 +231,7 @@ module CapTaffy
       end
 
       running_db_it "should do something to taps client" do
-        channel, stream, data = simulating_run_loop_with :data => ">> Listening on 0.0.0.0:5000, CTRL+C to stop\r\n" do
+        channel, stream, data = simulating_run_loop_with :data => sinatra_server_log_part(5000) do
           capistrano_run_with(Db.server_command(@options))
         end
         channel.expects(:close)
@@ -248,7 +248,7 @@ module CapTaffy
       running_db_it "should run taffy on different port" do
         @options[:port] = 1234
 
-        channel, stream, data = simulating_run_loop_with :data => ">> Listening on 0.0.0.0:1234, CTRL+C to stop\r\n" do
+        channel, stream, data = simulating_run_loop_with :data => sinatra_server_log_part(1234) do
           capistrano_run_with(Db.server_command(@options))
         end
         channel.expects(:close)
@@ -274,7 +274,7 @@ module CapTaffy
           client.do_something
         end
 
-        channel, stream, data = simulating_run_loop_with :data => ">> Listening on 0.0.0.0:5000, CTRL+C to stop\r\n" do
+        channel, stream, data = simulating_run_loop_with :data => sinatra_server_log_part(5000) do
           capistrano_run_with(Db.server_command(@options))
         end
         channel.expects(:close)
@@ -289,7 +289,7 @@ module CapTaffy
       end
 
       running_db_it "should force 127.0.0.1 (local) for remote url" do
-        channel, stream, data = simulating_run_loop_with :data => ">> Listening on 0.0.0.0:5000, CTRL+C to stop\r\n" do
+        channel, stream, data = simulating_run_loop_with :data => sinatra_server_log_part(5000) do
           capistrano_run_with(Db.server_command(@options))
         end
         channel.expects(:close)

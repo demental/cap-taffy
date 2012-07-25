@@ -10,7 +10,7 @@ Features
 * Authorize SSH access
 * Manage `database.yml` (Soon.)
 
-[`Taps`]("http://github.com/ricardochimal/taps") is great, but having to SSH into my deployment to run the `Taps` server, as well as 
+[`Taps`]("http://github.com/ricardochimal/taps") is great, but having to SSH into my deployment to run the `Taps` server, as well as
 figure out the proper local/remote database urls, is a pain. I knew the [`Heroku`]("http://github.com/heroku/heroku") gem
 had it figured out; I present the Capistrano friendly version.
 
@@ -34,7 +34,11 @@ Database Transfer
 
 ### Usage
 
-To start, add the following to your `Capfile`
+If you're using bundler, add the following to your `Capfile`
+
+    require "bundler/setup"
+
+Then, add the following to your `Capfile`
 
     require 'cap-taffy/db'
 
@@ -44,7 +48,7 @@ Then you can use:
 
     cap db:push         # Or to specify a different port: cap db:push -s taps_port=4321
     cap db:pull         # Or to specify a different port: cap db:pull -s taps_port=4321
-    
+
 
 #### SSH Local Forwarding
 

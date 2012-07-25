@@ -121,7 +121,7 @@ module CapTaffy::Db
     data_so_far = ""
     instance.run CapTaffy::Db.server_command(options) do |channel, stream, data|
       data_so_far << data
-      if data_so_far.include? ">> Listening on 0.0.0.0:#{port}, CTRL+C to stop"
+      if data_so_far.include? "== Sinatra/1.0 has taken the stage on #{port} for production with backup from WEBrick"
         host = force_local ? '127.0.0.1' : channel[:host]
         remote_url = CapTaffy::Db.remote_url(options.merge(:host => host))
 

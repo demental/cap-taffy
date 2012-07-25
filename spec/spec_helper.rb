@@ -145,6 +145,14 @@ module TaffyHelpers
     base.extend TaffyHelpers::ClassMethods
   end
 
+  #
+  # the string cap-taffy is waiting from the server (WEBRick)
+  #
+  def sinatra_server_log_part(port)
+    "== Sinatra/1.0 has taken the stage on #{port} for production with backup from WEBrick\r\n"
+    # Thin
+    # ">> Listening on 0.0.0.0:#{port}, CTRL+C to stop\r\n"
+  end
   # A simple helper for mocking a quick object
   #
   # Usage:
