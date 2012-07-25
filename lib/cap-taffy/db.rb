@@ -62,12 +62,12 @@ module CapTaffy::Db
   # A quick start for a Taps client.
   #
   # <tt>local_database_url</tt> and <tt>remote_url</tt> refer to the options for the Taps gem (see #run).
-  def taps_client(command, database_url, remote_url, options, &blk) # :yields: client
+  def taps_client(command, database_url, remote_url, &blk) # :yields: client
     Taps::Config.remote_url = remote_url
     Taps::Config.database_url = database_url
     Taps::Config.chunksize = 1000
     Taps::Config.verify_database_url(database_url)
-    yield Taps::Operation.factory(command, database_url, remote_url, options)
+    yield Taps::Operation.factory(command, database_url, remote_url)
   end
 
   # Generates the server command used to start a Taps server
@@ -125,7 +125,7 @@ module CapTaffy::Db
         host = force_local ? '127.0.0.1' : channel[:host]
         remote_url = CapTaffy::Db.remote_url(options.merge(:host => host))
 
-        taps_client(command, database_url, remote_url, options) do |client|
+        taps_client(command, local_database_url, remote_url) do |client|
           yield client
         end
         data_so_far = ""

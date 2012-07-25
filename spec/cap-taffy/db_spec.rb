@@ -158,7 +158,6 @@ module CapTaffy
         local_database_url = mock()
         remote_url = mock()
         command = mock()
-        options = mock()
         Taps::Config.expects(:chunksize=).with(1000)
         Taps::Config.expects(:database_url=).with(local_database_url)
         Taps::Config.expects(:remote_url=).with(remote_url)
@@ -167,7 +166,7 @@ module CapTaffy
 
         Taps::Operation.expects(:factory).returns(client)
 
-        Db.taps_client(command, local_database_url, remote_url, options) do |client|
+        Db.taps_client(command, local_database_url, remote_url) do |client|
           client.do_something
         end
       end
@@ -228,7 +227,7 @@ module CapTaffy
       running_db_it "should run with capistrano" do
         capistrano_run_with(Db.server_command(@options))
 
-        Db.run(@capistrano, @options)
+        Db.run(@capistrano, :pull, @options)
       end
 
       running_db_it "should do something to taps client" do
@@ -238,8 +237,8 @@ module CapTaffy
         channel.expects(:close)
 
         Db.expects(:remote_url).with(@options.merge(:host => channel[:host], :port => 5000)).returns("remote_url")
-        Db.expects(:taps_client).with("local", "remote_url").yields(taps_client_who(:expects, :do_something))
-        Db.run(@capistrano, @options) do |client|
+        Db.expects(:taps_client).with(:pull, "local", "remote_url").yields(taps_client_who(:expects, :do_something))
+        Db.run(@capistrano, :pull, @options) do |client|
           client.do_something
         end
 
@@ -254,9 +253,9 @@ module CapTaffy
         end
         channel.expects(:close)
         Db.expects(:remote_url).with(@options.merge(:host => channel[:host])).returns("remote_url")
-        Db.expects(:taps_client).with("local", "remote_url").yields(taps_client_who(:expects, :do_something))
+        Db.expects(:taps_client).with(:pull, "local", "remote_url").yields(taps_client_who(:expects, :do_something))
 
-        Db.run(@capistrano, @options) do |client|
+        Db.run(@capistrano, :pull, @options) do |client|
           client.do_something
         end
 
@@ -271,7 +270,7 @@ module CapTaffy
         client = mock()
         client.expects(:do_something).never
 
-        Db.run(@capistrano, @options) do |client|
+        Db.run(@capistrano, :pull, @options) do |client|
           client.do_something
         end
 
@@ -280,9 +279,9 @@ module CapTaffy
         end
         channel.expects(:close)
         Db.expects(:remote_url).with(@options.merge(:host => channel[:host], :port => 5000)).returns("remote_url")
-        Db.expects(:taps_client).with("local", "remote_url").yields(taps_client_who(:expects, :do_something))
+        Db.expects(:taps_client).with(:pull, "local", "remote_url").yields(taps_client_who(:expects, :do_something))
 
-        Db.run(@capistrano, @options) do |client|
+        Db.run(@capistrano, :pull, @options) do |client|
           client.do_something
         end
 
@@ -296,8 +295,8 @@ module CapTaffy
         channel.expects(:close)
 
         Db.expects(:remote_url).with(@options.merge(:host => '127.0.0.1', :port => 5000)).returns("remote_url")
-        Db.expects(:taps_client).with("local", "remote_url").yields(taps_client_who(:expects, :do_something))
-        Db.run(@capistrano, @options.merge(:local => true)) do |client|
+        Db.expects(:taps_client).with(:pull, "local", "remote_url").yields(taps_client_who(:expects, :do_something))
+        Db.run(@capistrano, :pull, @options.merge(:local => true)) do |client|
           client.do_something
         end
 
