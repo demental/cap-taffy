@@ -25,9 +25,9 @@ module CapTaffy
       for_task :detect, :roles => :app, :in => :Db, :it => "should be defined" do
         @mod.expects(:remote_database_url).returns("remote_db_url")
         @mod.expects(:local_database_url).returns("local_db_url")
-        
+
         load 'lib/cap-taffy/db.rb'
-        
+
         @namespace.instance_variable_get(:@remote_database_url).should == "remote_db_url"
         @namespace.instance_variable_get(:@local_database_url).should == "local_db_url"
       end
@@ -57,13 +57,13 @@ module CapTaffy
         end
       end
 
-      for_task :push, :roles => :app, :in => :Db, :it => "should send taps client cmd_send" do
+      for_task :push, :roles => :app, :in => :Db, :it => "should send taps client run with :push as cmd name" do
         options = {:remote_database_url => "remote", :local_database_url => "local", :port => nil, :login => "a_user", :password => "a_pass"}
         @namespace.expects(:detect)
         namespace_with_variables(:taps_port => nil)
         db_with_expected_options(options)
         @mod.expects(:tmp_pass).with(@namespace.fetch(:user)).returns(options[:password])
-        @mod.expects(:run).with(@namespace, options).yields(taps_client_who(:expects, :cmd_send))
+        @mod.expects(:run).with(@namespace, :push, options).yields(taps_client_who(:expects, :run))
 
         load_taffy_db
       end
@@ -74,7 +74,7 @@ module CapTaffy
         namespace_with_variables(:taps_port => 1234)
         db_with_expected_options(options)
         @mod.expects(:tmp_pass).with(@namespace.fetch(:user)).returns(options[:password])
-        @mod.expects(:run).with(@namespace, options)
+        @mod.expects(:run).with(@namespace, :push, options)
 
         load_taffy_db
       end
@@ -85,18 +85,18 @@ module CapTaffy
         namespace_with_variables(:taps_port => 1234, :local => true)
         db_with_expected_options(options)
         @mod.expects(:tmp_pass).with(@namespace.fetch(:user)).returns(options[:password])
-        @mod.expects(:run).with(@namespace, options.merge(:local => true))
+        @mod.expects(:run).with(@namespace, :push, options.merge(:local => true))
 
         load_taffy_db
       end
-      
+
       for_task :pull, :roles => :app, :in => :Db, :it => "should send taps client cmd_receive" do
         options = {:remote_database_url => "remote", :local_database_url => "local", :port => nil, :login => "a_user", :password => "a_pass"}
         @namespace.expects(:detect)
         namespace_with_variables(:taps_port => nil)
         db_with_expected_options(options)
         @mod.expects(:tmp_pass).with(@namespace.fetch(:user)).returns(options[:password])
-        @mod.expects(:run).with(@namespace, options).yields(taps_client_who(:expects, :cmd_receive))
+        @mod.expects(:run).with(@namespace, :pull, options).yields(taps_client_who(:expects, :run))
 
         load_taffy_db
       end
@@ -157,15 +157,17 @@ module CapTaffy
         client = mock()
         local_database_url = mock()
         remote_url = mock()
+        command = mock()
+        options = mock()
         Taps::Config.expects(:chunksize=).with(1000)
         Taps::Config.expects(:database_url=).with(local_database_url)
         Taps::Config.expects(:remote_url=).with(remote_url)
         Taps::Config.expects(:verify_database_url)
         client.expects(:do_something)
 
-        Taps::ClientSession.expects(:quickstart).yields(client)
+        Taps::Operation.expects(:factory).returns(client)
 
-        Db.taps_client(local_database_url, remote_url) do |client|
+        Db.taps_client(command, local_database_url, remote_url, options) do |client|
           client.do_something
         end
       end
@@ -179,14 +181,14 @@ module CapTaffy
 
         Db.server_command(@options).should == "taps server #{remote_database_url} #{login} #{password}"
       end
-      
+
       it "should build server command with port" do
         @options[:port] = 1234
         remote_database_url, login, password, port = @options[:remote_database_url], @options[:login], @options[:password], @options[:port]
 
         Db.server_command(@options).should == "taps server #{remote_database_url} #{login} #{password} --port=#{port}"
       end
-      
+
       it "should build server command without port if same as default port" do
         @options[:port] = 5000
         remote_database_url, login, password = @options[:remote_database_url], @options[:login], @options[:password]
@@ -202,7 +204,7 @@ module CapTaffy
       end
 
       it "should build remote url (with some help)" do
-        @options[:host] = "127.0.0.1"        
+        @options[:host] = "127.0.0.1"
         parser_expects_uri_hash_to_url_with(@options[:login], @options[:password], "#{@options[:host]}:#{Db.default_server_port}").returns("remote_url/")
 
         Db.remote_url(@options)
