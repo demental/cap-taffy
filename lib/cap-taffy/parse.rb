@@ -1,12 +1,12 @@
 require 'rubygems'
-begin
+# begin
   require 'heroku'
   require 'heroku/command'
-  require 'heroku/commands/base'
-  require 'heroku/commands/db'
-rescue LoadError
-  error "Install the Heroku gem. On most systems this will be:\nsudo gem install heroku"
-end
+  require 'heroku/command/base'
+  require 'heroku/command/db'
+# rescue LoadError
+#   error "Install the Heroku gem. On most systems this will be:\nsudo gem install heroku"
+# end
 
 module CapTaffy
   class Parse < Heroku::Command::Db

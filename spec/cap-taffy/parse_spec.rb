@@ -1,5 +1,5 @@
 require File.join(File.dirname(__FILE__), %w[.. spec_helper])
-require 'lib/cap-taffy/parse'
+require File.expand_path(File.join(File.dirname(__FILE__), %w[.. .. lib cap-taffy parse]))
 
 module CapTaffy
   describe Parse do
@@ -45,7 +45,7 @@ module CapTaffy
     it "should parse database config for mysql" do
       Parse.database_url(@database_config, 'production').should == "mysql://root:root@localhost/test_production?encoding=utf8"
     end
-    
+
     it "should raise invalid conf if so" do
       lambda { Parse.database_url(nil, nil) }.should raise_error(Parse::Invalid)
     end

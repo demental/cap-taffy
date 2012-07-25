@@ -1,35 +1,20 @@
-# Look in the tasks/setup.rb file for the various options that can be
-# configured in this Rakefile. The .rake files in the tasks directory
-# are where the options are used.
-
+# encoding: UTF-8
+require 'rubygems'
 begin
-  require 'bones'
-  Bones.setup
+  require 'bundler/setup'
 rescue LoadError
-  begin
-    load 'tasks/setup.rb'
-  rescue LoadError
-    raise RuntimeError, '### please install the "bones" gem ###'
-  end
+  puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
 
-ensure_in_path 'lib'
-require 'cap-taffy'
+require 'bundler'
+Bundler::GemHelper.install_tasks
 
-task :default => 'spec:run'
+require 'rake'
+require 'rspec/core/rake_task'
 
-PROJ.name = 'cap-taffy'
-PROJ.authors = 'Henry Hsu'
-PROJ.email = 'henry@qlane.com'
-PROJ.url = 'http://by.qlane.com'
-PROJ.version = CapTaffy::VERSION
-PROJ.rubyforge.name = 'cap-taffy'
-PROJ.readme_file = "README.md"
-PROJ.gem.dependencies = ['heroku', 'taps', 'capistrano']
-PROJ.gem.development_dependencies << ["mocha"]
-PROJ.description = "Capistrano recipes for deploying databases and other common tasks."
-PROJ.summary = "Capistrano recipes for deploying databases (managing database.yml, importing/exporting/transfering databases, etc.)"
-PROJ.ignore_file = '.gitignore'
-PROJ.spec.opts << '--color'
-PROJ.exclude << "bin"
-PROJ.rcov.opts << IO.readlines("spec/rcov.opts").map {|l| l.chomp.split " "}.flatten
+desc "Run all examples"
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = %w[--color]
+end
+
+task :default => :spec

@@ -3,7 +3,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib cap-taffy])
 module Capistrano # :nodoc:
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   # == Mock Framework
   #
   # RSpec uses it's own mocking framework by default. If you prefer to
@@ -75,7 +75,7 @@ module CapistranoHelpers
   end
 
   # The Capistrano <tt>:run</tt> action loops with <tt>channel</tt>, <tt>stream</tt>, and <tt>data</tt> until the channel is closed.
-  # 
+  #
   # Passing in a <tt>:run</tt> expectation, modifies the expectation such that each subsequent invocation ("loop") yields <tt>channel</tt>, <tt>stream</tt>, and <tt>data</tt>
   #
   # ==== Parameters
@@ -95,7 +95,7 @@ module CapistranoHelpers
   module ClassMethods
     # Used in specs to test Capistrano tasks.
     #
-    # 
+    #
     # Code defined in the task will be executed automatically on load. (Note the <tt>yields</tt>, see Mocha#yields[http://mocha.rubyforge.org/classes/Mocha/Expectation.html#M000043])
     #
     # ==== Parameters
@@ -146,7 +146,7 @@ module TaffyHelpers
   end
 
   # A simple helper for mocking a quick object
-  # 
+  #
   # Usage:
   #   taps_client_who(:expects, :do_something)
   def taps_client_who(method_symbol, *args)
@@ -165,7 +165,7 @@ module TaffyHelpers
 
         # See CapistranoHelpers
         def capistrano_run_with(*args)
-          run_with(@capistrano, *args) 
+          run_with(@capistrano, *args)
         end
 
         it message, &blk
