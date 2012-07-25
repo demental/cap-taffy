@@ -1,9 +1,9 @@
 require 'rubygems'
 gem 'taps', '>= 0.2.8', '< 0.3.30'
-require 'taps/client_session'
+require 'taps/operation'
 
 require File.join(File.dirname(__FILE__), %w[.. cap-taffy]) unless defined?(CapTaffy)
-require File.join(File.dirname(__FILE__), 'parse')
+require 'cap-taffy/parse'
 require 'digest/sha1'
 
 module CapTaffy::Db
@@ -116,7 +116,7 @@ module CapTaffy::Db
   #       client.cmd_send
   #     end
   #   end
-  def run(instance, options = {} , &blk) # :yields: client
+  def run(instance, command, options = {} , &blk) # :yields: client
     options[:port] ||= default_server_port
     remote_database_url, login, password, port, local_database_url = options[:remote_database_url], options[:login], options[:password], options[:port], options[:local_database_url]
     force_local = options.delete(:local)
@@ -128,10 +128,7 @@ module CapTaffy::Db
         host = force_local ? '127.0.0.1' : channel[:host]
         remote_url = CapTaffy::Db.remote_url(options.merge(:host => host))
 
-        CapTaffy::Db.taps_client(local_database_url, remote_url) do |client|
-          yield client
-        end
-
+        yield Taps::Operation.factory(method, database_url, remote_url, options)
         data_so_far = ""
         channel.close
         channel[:status] = 0
@@ -192,8 +189,8 @@ Capistrano::Configuration.instance.load do
       options = {:remote_database_url => @remote_database_url, :login => login, :password => password, :local_database_url => @local_database_url, :port => variables[:taps_port]}
       options.merge!(:local => true) if variables[:local]
 
-      CapTaffy::Db.run(self, options) do |client|
-        client.cmd_send
+      CapTaffy::Db.run(self, :push, options) do |client|
+        client.run
       end
     end
 
@@ -227,8 +224,8 @@ Capistrano::Configuration.instance.load do
       options = {:remote_database_url => @remote_database_url, :login => login, :password => password, :local_database_url => @local_database_url, :port => variables[:taps_port]}
       options.merge!(:local => true) if variables[:local]
 
-      CapTaffy::Db.run(self, options) do |client|
-        client.cmd_receive
+      CapTaffy::Db.run(self, :pull, options) do |client|
+        client.run
       end
     end
   end
